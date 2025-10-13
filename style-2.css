@@ -14,7 +14,6 @@ body {
 header, footer {
 	background: #ef476f;
 	color: #fff;
-	text-align: center;
 	padding: 2em 3em 1.2em 3em;
 	font-family: 'Montserrat', Arial, sans-serif;
 	letter-spacing: 2px;
@@ -27,6 +26,7 @@ header, footer {
 footer {
 	font-size: 0.95em;
 	opacity: 0.7;
+    text-align: center;
 }
 
 main {
@@ -71,7 +71,6 @@ h3 {
 p {
 	line-height: 1.8;
 	margin-bottom: 1.2em;
-	text-align: justify;
 	font-size: 1.08em;
 }
 

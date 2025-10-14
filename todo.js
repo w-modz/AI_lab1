@@ -1,160 +1,195 @@
-// Initialize task list from Local Storage or empty array
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+class TodoApp {
+    constructor() {
+        this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-// Function to save tasks to Local Storage
-function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-}
+        // DOM elements
+        this.taskListEl = document.getElementById('taskList');
+        this.newTaskInput = document.getElementById('newTaskInput');
+        this.deadlineInput = document.getElementById('taskDeadline');
+        this.searchInput = document.getElementById('searchInput');
+        this.addButton = null;
 
-// Function to render task list
-function renderTasks(filteredTasks = null) {
-    const taskList = document.getElementById('taskList');
-    const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-    const tasksToRender = filteredTasks || tasks;
+        // bind handlers
+        this.handleAdd = this.handleAdd.bind(this);
+        this.handleSearch = this.handleSearch.bind(this);
 
-    taskList.innerHTML = '';
+        // initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // attach add button if present
+            this.addButton = document.querySelector('[onclick="addTask()"]');
+            if (this.addButton) {
+                // replace inline handler with proper binding
+                this.addButton.removeAttribute('onclick');
+                this.addButton.addEventListener('click', this.handleAdd);
+            }
 
-    tasksToRender.forEach((task, index) => {
-        const li = document.createElement('li');
-        li.className = 'task-item';
+            if (this.searchInput) this.searchInput.addEventListener('input', this.handleSearch);
 
-        // Create task content
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'task-content';
+            this.setDefaultDate();
+            this.draw();
+        });
+    }
 
-        // Highlight search phrase
-        if (searchQuery && searchQuery.length >= 2) {
-            const regex = new RegExp(`(${searchQuery})`, 'gi');
-            contentDiv.innerHTML = task.content.replace(regex, '<span class="highlight">$1</span>');
-        } else {
-            contentDiv.textContent = task.content;
-        }
+    save() {
+        localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    }
 
-        // Add deadline if exists
-        if (task.deadline) {
-            const deadline = new Date(task.deadline);
-            contentDiv.innerHTML += `<br><small>Deadline: ${deadline.toLocaleString()}</small>`;
-        }
+    draw(renderIndices = null) {
+        // renderIndices: array of task indexes to render; if null render all
+        const searchQuery = this.searchInput ? this.searchInput.value.toLowerCase() : '';
+        const indices = renderIndices || this.tasks.map((_, i) => i);
 
-        // Handle task editing
-        contentDiv.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = task.content;
-            input.style.width = '80%';
+        this.taskListEl.innerHTML = '';
 
-            const saveEdit = () => {
-                const newContent = input.value.trim();
-                if (validateTask(newContent)) {
-                    tasks[index].content = newContent;
-                    saveTasks();
-                    renderTasks();
-                }
-            };
+        indices.forEach((taskIndex) => {
+            const task = this.tasks[taskIndex];
 
-            input.addEventListener('blur', saveEdit);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    saveEdit();
-                }
+            const li = document.createElement('li');
+            li.className = 'task-item';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'task-content';
+
+            if (searchQuery && searchQuery.length >= 2) {
+                const regex = new RegExp(`(${searchQuery})`, 'gi');
+                contentDiv.innerHTML = task.content.replace(regex, '<span class="highlight">$1</span>');
+            } else {
+                contentDiv.textContent = task.content;
+            }
+
+            if (task.deadline) {
+                const deadline = new Date(task.deadline);
+                contentDiv.innerHTML += `<br><small>Deadline: ${deadline.toLocaleString()}</small>`;
+            }
+
+            // editing
+            contentDiv.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = task.content;
+                input.style.width = '80%';
+
+                const saveEdit = () => {
+                    const newContent = input.value.trim();
+                    if (this.validateTask(newContent, task.deadline)) {
+                        this.editTask(taskIndex, newContent);
+                    } else {
+                        // keep focus so user can fix input
+                        setTimeout(() => input.focus(), 0);
+                    }
+                };
+
+                input.addEventListener('blur', saveEdit);
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        if (this.validateTask(input.value.trim(), task.deadline)) {
+                            saveEdit();
+                        } else {
+                            e.preventDefault();
+                        }
+                    }
+                });
+
+                contentDiv.innerHTML = '';
+                contentDiv.appendChild(input);
+                input.focus();
             });
 
-            contentDiv.innerHTML = '';
-            contentDiv.appendChild(input);
-            input.focus();
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.addEventListener('click', () => this.deleteTask(taskIndex));
+
+            li.appendChild(contentDiv);
+            li.appendChild(deleteBtn);
+            this.taskListEl.appendChild(li);
         });
-
-        // Delete button
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = '🗑️';
-        deleteBtn.addEventListener('click', () => {
-            tasks.splice(index, 1);
-            saveTasks();
-            renderTasks();
-        });
-
-        li.appendChild(contentDiv);
-        li.appendChild(deleteBtn);
-        taskList.appendChild(li);
-    });
-}
-
-// Task validation function
-function validateTask(content, deadline = null) {
-    if (content.length < 3) {
-        alert('Task must be at least 3 characters long!');
-        return false;
     }
-    if (content.length > 255) {
-        alert('Task cannot be longer than 255 characters!');
-        return false;
-    }
-    if (deadline) {
+
+    validateTask(content, deadline) {
+        if (!content || content.length < 3) {
+            alert('Task must be at least 3 characters long!');
+            return false;
+        }
+        if (content.length > 255) {
+            alert('Task cannot be longer than 255 characters!');
+            return false;
+        }
+        if (!deadline) {
+            alert('Deadline is required!');
+            return false;
+        }
         const deadlineDate = new Date(deadline);
         const now = new Date();
         if (deadlineDate <= now) {
             alert('Deadline must be in the future!');
             return false;
         }
+        return true;
     }
-    return true;
+
+    addTask(content, deadline) {
+        this.tasks.push({ content, deadline, createdAt: new Date().toISOString() });
+        this.save();
+        this.draw();
+    }
+
+    handleAdd() {
+        const content = this.newTaskInput.value.trim();
+        const deadline = this.deadlineInput.value;
+        if (this.validateTask(content, deadline)) {
+            this.addTask(content, deadline);
+            // clear content only; advance deadline by one day
+            this.newTaskInput.value = '';
+
+            const nextDeadline = new Date(deadline);
+            nextDeadline.setDate(nextDeadline.getDate() + 1);
+            const year = nextDeadline.getFullYear();
+            const month = String(nextDeadline.getMonth() + 1).padStart(2, '0');
+            const day = String(nextDeadline.getDate()).padStart(2, '0');
+            const hours = String(nextDeadline.getHours()).padStart(2, '0');
+            const minutes = String(nextDeadline.getMinutes()).padStart(2, '0');
+            this.deadlineInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+    }
+
+    editTask(index, newContent) {
+        this.tasks[index].content = newContent;
+        this.save();
+        this.draw();
+    }
+
+    deleteTask(index) {
+        this.tasks.splice(index, 1);
+        this.save();
+        this.draw();
+    }
+
+    handleSearch(e) {
+        const query = e.target.value.toLowerCase();
+        if (query.length >= 2) {
+            const matched = [];
+            this.tasks.forEach((t, i) => {
+                if (t.content.toLowerCase().includes(query)) matched.push(i);
+            });
+            this.draw(matched);
+        } else {
+            this.draw();
+        }
+    }
+
+    setDefaultDate() {
+        const now = new Date();
+        now.setDate(now.getDate() + 1);
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const defaultDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+        if (this.deadlineInput) this.deadlineInput.value = defaultDateTime;
+    }
 }
 
-// Function to add new task
-function addTask() {
-    const contentInput = document.getElementById('newTaskInput');
-    const deadlineInput = document.getElementById('taskDeadline');
-    const content = contentInput.value.trim();
-    const deadline = deadlineInput.value;
-
-    if (validateTask(content, deadline)) {
-        tasks.push({
-            content,
-            deadline: deadline || null,
-            createdAt: new Date().toISOString()
-        });
-        
-        saveTasks();
-        renderTasks();
-        
-        // Clear form fields
-        contentInput.value = '';
-        deadlineInput.value = '';
-    }
-}
-
-// Search handling
-document.getElementById('searchInput').addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase();
-    if (query.length >= 2) {
-        const filteredTasks = tasks.filter(task => 
-            task.content.toLowerCase().includes(query)
-        );
-        renderTasks(filteredTasks);
-    } else {
-        renderTasks();
-    }
-});
-
-// Function to set default date to tomorrow
-function setDefaultDate() {
-    const now = new Date();
-    // Set date to tomorrow
-    now.setDate(now.getDate() + 1);
-    
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    
-    const defaultDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    document.getElementById('taskDeadline').value = defaultDateTime;
-}
-
-// Initial task rendering and default date setting
-document.addEventListener('DOMContentLoaded', () => {
-    renderTasks();
-    setDefaultDate();
-});
+// create global instance
+const todoApp = new TodoApp();

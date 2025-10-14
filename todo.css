@@ -1,0 +1,138 @@
+:root {
+    --primary-color: #6b9ac4;
+    --secondary-color: #97d8c4;
+    --background-color: #f4f9f4;
+    --text-color: #2d4059;
+    --danger-color: #ff6b6b;
+    --success-color: #4ecdc4;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 20px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.search-container {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.search-container input {
+    width: 80%;
+    padding: 12px;
+    border: 2px solid var(--primary-color);
+    border-radius: 25px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.search-container input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin: 8px 0;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.task-item:hover {
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.task-content {
+    flex-grow: 1;
+    margin-right: 15px;
+}
+
+.delete-btn {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    background-color: #ff5252;
+    transform: scale(1.05);
+}
+
+.add-task-form {
+    margin-top: 30px;
+    padding: 20px;
+    border-top: 2px solid var(--secondary-color);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.highlight {
+    background-color: #ffd93d;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+input[type="text"], input[type="datetime-local"] {
+    padding: 10px;
+    border: 2px solid var(--primary-color);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+input[type="text"] {
+    width: 50%;
+}
+
+input[type="datetime-local"] {
+    width: 200px;
+}
+
+input[type="text"]:focus, input[type="datetime-local"]:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+button {
+    padding: 10px 20px;
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #3dbdb4;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}

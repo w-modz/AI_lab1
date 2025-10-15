@@ -59,10 +59,42 @@ class TodoApp {
 
             if (task.deadline) {
                 const deadline = new Date(task.deadline);
-                contentDiv.innerHTML += `<br><small>Deadline: ${deadline.toLocaleString()}</small>`;
+                const deadlineDiv = document.createElement('div');
+                deadlineDiv.className = 'task-deadline';
+                deadlineDiv.innerHTML = `<small>Deadline: ${deadline.toLocaleString()}</small>`;
+                
+                // Make deadline clickable for editing
+                deadlineDiv.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent content edit from triggering
+                    const dateInput = document.createElement('input');
+                    dateInput.type = 'datetime-local';
+                    dateInput.value = task.deadline.slice(0, 16); // Format for datetime-local input
+                    dateInput.style.width = '200px';
+
+                    const saveDeadline = () => {
+                        const newDeadline = dateInput.value;
+                        if (this.validateTask(task.content, newDeadline)) {
+                            this.editTaskDeadline(taskIndex, newDeadline);
+                            deadlineDiv.innerHTML = `<small>Deadline: ${new Date(newDeadline).toLocaleString()}</small>`;
+                        }
+                    };
+
+                    dateInput.addEventListener('blur', saveDeadline);
+                    dateInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            saveDeadline();
+                        }
+                    });
+
+                    deadlineDiv.innerHTML = '';
+                    deadlineDiv.appendChild(dateInput);
+                    dateInput.focus();
+                });
+                
+                contentDiv.appendChild(deadlineDiv);
             }
 
-            // editing
+            // editing content
             contentDiv.addEventListener('click', () => {
                 const input = document.createElement('input');
                 input.type = 'text';
@@ -147,6 +179,12 @@ class TodoApp {
 
     editTask(index, newContent) {
         this.tasks[index].content = newContent;
+        this.save();
+        this.draw();
+    }
+
+    editTaskDeadline(index, newDeadline) {
+        this.tasks[index].deadline = newDeadline;
         this.save();
         this.draw();
     }

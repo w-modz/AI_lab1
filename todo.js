@@ -141,15 +141,7 @@ class TodoApp {
             this.addTask(content, deadline);
             // clear content only; advance deadline by one day
             this.newTaskInput.value = '';
-
-            const nextDeadline = new Date(deadline);
-            nextDeadline.setDate(nextDeadline.getDate() + 1);
-            const year = nextDeadline.getFullYear();
-            const month = String(nextDeadline.getMonth() + 1).padStart(2, '0');
-            const day = String(nextDeadline.getDate()).padStart(2, '0');
-            const hours = String(nextDeadline.getHours()).padStart(2, '0');
-            const minutes = String(nextDeadline.getMinutes()).padStart(2, '0');
-            this.deadlineInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            // keep the deadline input unchanged (do not advance)
         }
     }
 
@@ -180,6 +172,7 @@ class TodoApp {
 
     setDefaultDate() {
         const now = new Date();
+        // set to tomorrow
         now.setDate(now.getDate() + 1);
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');

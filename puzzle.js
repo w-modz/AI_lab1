@@ -3,7 +3,7 @@ class MapPuzzle {
         this.map = null;
         this.marker = null;
         this.puzzlePieces = [];
-        this.gridSize = 2; // default size
+        this.gridSize = 2;
         this.correctPositions = 0;
         this.mapVisible = true;
 
@@ -16,7 +16,7 @@ class MapPuzzle {
         this.setupDragAndDrop();
         
         // Set placeholder text for coordinates
-        document.getElementById('coordinates').textContent = 'Click "Moja lokalizacja"';
+        document.getElementById('coordinates').textContent = 'Click "My location to get coordinates"';
     }
 
     async initNotifications() {
@@ -68,19 +68,30 @@ class MapPuzzle {
     initDownloadButton() {
         document.getElementById('downloadBtn').addEventListener('click', async () => {
             try {
-                const mapElement = document.getElementById('map');
-                
+                // Get the selected grid size and calculate board size
+                const gridSize = this.gridSize;
+                // Use a base tile size (e.g. 150px per piece)
+                const pieceSize = 150;
+                const boardSize = gridSize * pieceSize;
+
+                // Resize map container and board to match selected size
+                document.getElementById('map').style.width = boardSize + 'px';
+                document.getElementById('map').style.height = boardSize + 'px';
+                document.getElementById('puzzleBoard').style.width = boardSize + 'px';
+                document.getElementById('puzzleBoard').style.height = boardSize + 'px';
+
+                // Wait for map to resize and tiles to load
+                await new Promise(resolve => setTimeout(resolve, 400));
+
                 // Get the current map bounds and size
                 const bounds = this.map.getBounds();
-                const size = this.map.getSize();
+                const size = { x: boardSize, y: boardSize };
 
-                // Create a static map URL
                 const staticMapUrl = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export?bbox=${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}&bboxSR=4326&layers=&layerDefs=&size=${size.x},${size.y}&imageSR=&format=png&transparent=false&dpi=&time=&layerTimeOptions=&dynamicLayers=&gdbVersion=&mapScale=&rotation=&datumTransformations=&layerParameterValues=&mapRangeValues=&layerRangeValues=&f=image`;
 
                 // Load the static map image
                 const img = new Image();
                 img.crossOrigin = "Anonymous";
-                
                 img.onload = () => {
                     // Create a canvas and draw the image
                     const canvas = document.createElement('canvas');
@@ -88,18 +99,14 @@ class MapPuzzle {
                     canvas.height = size.y;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, size.x, size.y);
-                    
                     this.createPuzzle(canvas);
                     this.toggleMap(false);
                 };
-
                 img.onerror = () => {
                     console.error('Error loading static map image');
                     alert('Error capturing map image. Please try again.');
                 };
-
                 img.src = staticMapUrl;
-
             } catch (error) {
                 console.error('Error capturing map:', error);
                 alert('Error capturing map image');

@@ -105,11 +105,16 @@ button:hover {
     display: flex;
     gap: 20px;
     margin-top: 20px;
+    max-width: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 #puzzleBoard {
-    width: 500px;
-    height: 500px;
+    width: calc(50% - 10px);
+    aspect-ratio: 1;
+    max-width: 500px;
+    max-height: 500px;
     background: rgba(0, 0, 0, 0.2);
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -118,11 +123,16 @@ button:hover {
     padding: 1px;
     border-radius: 15px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    flex-shrink: 0;
+    order: 1;
 }
 
 #puzzlePieces {
-    flex: 1;
-    min-height: 600px;
+    width: calc(50% - 10px);
+    max-width: 500px;
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
     background: rgba(255, 255, 255, 0.1);
     padding: 15px;
     border-radius: 15px;
@@ -132,6 +142,8 @@ button:hover {
     align-content: flex-start;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    flex-shrink: 0;
+    order: 2;
 }
 
 .puzzle-piece {

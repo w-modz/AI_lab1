@@ -318,6 +318,7 @@ class MapPuzzle {
     }
 
     showCompletionNotification() {
+        console.log('Puzzle completed successfully! All pieces are in correct positions.');
         if (Notification.permission === 'granted') {
             new Notification('Gratulacje!', {
                 body: 'Układanka została ukończona poprawnie!',

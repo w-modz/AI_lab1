@@ -8,7 +8,8 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 80%;
+    width: 80%;
     margin: 0 auto;
     background: rgba(255, 255, 255, 0.1);
     padding: 30px;
@@ -29,13 +30,74 @@ h1 {
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
+.language-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#languageSelector {
+    padding: 10px 15px;
+    font-size: 14px;
+    border: none;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+#languageSelector:focus {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
 .search-section {
     display: flex;
     gap: 15px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
+}
+
+.forecast-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 20px;
+}
+
+.forecast-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: none;
+}
+
+.forecast-btn:first-child {
+    border-radius: 15px 0 0 15px;
+}
+
+.forecast-btn:last-child {
+    border-radius: 0 15px 15px 0;
+    border-left: none;
+}
+
+.forecast-btn.active {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+}
+
+.forecast-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
 }
 
 #addressInput {

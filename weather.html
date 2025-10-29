@@ -13,9 +13,21 @@
         </header>
         
         <main>
+            <div class="language-section">
+                <select id="languageSelector">
+                    <option value="pl">Polski</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            
             <div class="search-section">
                 <input type="text" id="addressInput" placeholder="Wprowadź adres (np. Warszawa, Polska)" />
                 <button id="weatherBtn">Pogoda</button>
+            </div>
+            
+            <div class="forecast-switcher" id="forecastSwitcher" style="display: none;">
+                <button id="currentBtn" class="forecast-btn active">Current</button>
+                <button id="fiveDayBtn" class="forecast-btn">5-Day Forecast</button>
             </div>
             
             <div id="weatherDisplay" class="weather-display">

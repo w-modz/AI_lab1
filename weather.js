@@ -1,5 +1,6 @@
 class WeatherApp {
     constructor() {
+        // API key in plain text lmao
         this.apiKey = '7ded80d91f2b280ec979100cc8bbba94';
         this.currentLanguage = 'pl';
         this.currentForecastType = 'current';
@@ -188,13 +189,10 @@ class WeatherApp {
     getWeatherData(coordinates) {
         return new Promise((resolve, reject) => {
             const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}&units=metric&lang=${this.currentLanguage}`;
-            
             console.log('Getting weather data for coordinates:', coordinates.lat, coordinates.lon);
             
             const xhr = new XMLHttpRequest();
-            
             xhr.open('GET', weatherUrl, true);
-            
             xhr.onload = () => {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     try {
